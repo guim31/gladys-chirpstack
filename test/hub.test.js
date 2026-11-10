@@ -280,7 +280,7 @@ test('the device list survives a restart: Discovery, silence and downlinks', asy
   const second = await createWorld({ storage, devices: [added] });
   t.after(() => second.app.stop());
   second.broker.accept();
-  await second.hub.publishDiscovery({ force: true });
+  await flush();
   assert.equal(second.gladys.fake.discoveredDevices[0].features.length, added.features.length);
   // The application is known: a downlink can go before any new uplink.
   const result = await second.hub.sendDownlink({

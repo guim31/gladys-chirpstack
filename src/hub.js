@@ -136,6 +136,12 @@ export class Hub {
       onState: (state, detail) => this.onLinkState(state, detail),
       ...(this.connectMqtt ? { connect: this.connectMqtt } : {}),
     });
+    // The devices kept in /data are offered again at once, without waiting
+    // for each of them to send.
+    if (this.store.devices.size > 0) {
+      this.discoveryKey = '';
+      this.scheduleDiscovery();
+    }
     clearInterval(this.silenceTimer);
     this.silenceTimer = setInterval(() => {
       this.checkSilence().catch((err) => logger.error(`Silence check failed: ${err.message}`));
