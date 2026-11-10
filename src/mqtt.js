@@ -15,6 +15,7 @@ import mqtt from 'mqtt';
 export const RECONNECT_PERIOD_MS = 15 * 1000;
 export const CONNECT_TIMEOUT_MS = 10 * 1000;
 export const KEEPALIVE_S = 30;
+export const PUBLISH_TIMEOUT_MS = 5 * 1000;
 
 /** A percent-encoded URL part; a malformed one is kept as typed. */
 function decode(value) {
@@ -136,11 +137,19 @@ export function createClient({
      * Publish once, QoS 1: resolves when the broker acknowledged it (an ACL
      * denial is not reported by MQTT 3.1.1: the broker acknowledges anyway).
      */
-    publish(topic, payload) {
+    publish(topic, payload, timeoutMs = PUBLISH_TIMEOUT_MS) {
       return new Promise((resolve, reject) => {
-        client.publish(topic, payload, { qos: 1, retain: false }, (err) =>
-          err ? reject(err) : resolve(),
-        );
+        // A link lost before the PUBACK would keep the message queued until a
+        // reconnection: the scene gets an answer in time instead.
+        const timer = setTimeout(() => reject(new Error('no acknowledgement')), timeoutMs);
+        client.publish(topic, payload, { qos: 1, retain: false }, (err) => {
+          clearTimeout(timer);
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
       });
     },
     stop() {

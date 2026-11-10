@@ -276,3 +276,7 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
   silence (`silentSince` persistant, pour ne pas redéclencher après redémarrage).
 - `uplink_received` part à **chaque** uplink d'un appareil ajouté : c'est voulu (boutons, compteurs), le
   cœur filtre. Budget : quelques états par uplink, loin des 300/min pour un usage domestique.
+- **Compteurs et durées avant détecteurs** : `DOOR_OPEN_TIMES`, `LAST_WATER_LEAK_DURATION` (codecs Dragino
+  LDS02/LWL02) contiennent les mots d'un détecteur ; les mots de compte ou de durée sont testés d'abord, sinon
+  la porte resterait « ouverte » pour toujours (type figé à la première vue). Une `battery` décimale ≤ 5 est
+  une tension.

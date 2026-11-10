@@ -105,7 +105,15 @@ export class Hub {
       previous.tls_insecure === config.tls_insecure &&
       previous.topic_prefix === config.topic_prefix;
     if (sameLink && this.client) {
-      // Only the key overrides, the silence delay or the language changed.
+      // Only the key overrides, the silence delay or the language changed, or
+      // Gladys came back: tell it the link state again (a status sent while
+      // Gladys was away was lost).
+      const state = this.client.state;
+      if (state === 'connected') {
+        await this.#status(true);
+      } else if (state) {
+        await this.#status(false, state === 'refused' ? MESSAGES.refused : MESSAGES.unreachable);
+      }
       this.discoveryKey = '';
       this.scheduleDiscovery();
       return;
@@ -283,12 +291,13 @@ export class Hub {
     }
     logger.debug(`Uplink from ${record.devEui}: fPort ${message.fPort}, ${keys.length} value(s)`);
     await this.#publish(record.devEui, keys);
+    const wasSilent = record.silentSince !== null;
+    record.silentSince = null;
     if (!added) {
       return;
     }
     const name = added.name ?? '';
-    if (record.silentSince !== null) {
-      record.silentSince = null;
+    if (wasSilent) {
       logger.info(`${name || record.devEui} sends again`);
       await this.#fire(TRIGGER.DEVICE_BACK, { device: added.external_id, device_name: name });
     }

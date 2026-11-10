@@ -151,3 +151,20 @@ test('every kind has display bounds', () => {
     assert.ok(spec.min < spec.max, kind);
   }
 });
+
+test('counts and durations of a detector are not the detector (Dragino LDS02, LWL02)', () => {
+  assert.equal(guessKind('DOOR_OPEN_STATUS', 1), 'opening');
+  assert.equal(guessKind('DOOR_OPEN_TIMES', 3), 'counter');
+  assert.equal(guessKind('LAST_DOOR_OPEN_DURATION', 12), 'number');
+  assert.equal(guessKind('WATER_LEAK_STATUS', 0), 'leak');
+  assert.equal(guessKind('WATER_LEAK_TIMES', 2), 'counter');
+  assert.equal(guessKind('LAST_WATER_LEAK_DURATION', 5), 'number');
+  assert.equal(guessKind('pir_count', 4), 'counter');
+  assert.equal(guessKind('tamper_count', 1), 'counter');
+});
+
+test('a battery in volts is a voltage, in percent a battery', () => {
+  assert.equal(guessKind('battery', 3.6), 'voltage');
+  assert.equal(guessKind('battery', 87), 'battery');
+  assert.equal(guessKind('battery', 3), 'battery');
+});

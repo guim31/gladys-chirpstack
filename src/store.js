@@ -20,12 +20,18 @@ export const MAX_DEVICES = 500;
 export function fileStorage(dir = process.env.DATA_DIR || '/data') {
   const file = join(dir, 'devices.json');
   return {
+    /** null when there is no file yet; throws when it cannot be read. */
     async load() {
+      let text;
       try {
-        return JSON.parse(await readFile(file, 'utf8'));
-      } catch {
-        return null;
+        text = await readFile(file, 'utf8');
+      } catch (err) {
+        if (err.code === 'ENOENT') {
+          return null;
+        }
+        throw err;
       }
+      return JSON.parse(text);
     },
     async save(data) {
       await mkdir(dir, { recursive: true });
@@ -93,7 +99,16 @@ export class DeviceStore {
   }
 
   async load() {
-    const data = await this.storage.load().catch(() => null);
+    let data;
+    try {
+      data = await this.storage.load();
+    } catch (err) {
+      // Unreadable or damaged: never overwrite it, keep this run in memory.
+      this.logger.warn(
+        `The device list in /data cannot be read, not saved this run (${err.message})`,
+      );
+      return;
+    }
     this.devices.clear();
     for (const [devEui, raw] of Object.entries(data?.devices ?? {})) {
       if (/^[0-9a-f]{16}$/.test(devEui) && raw && typeof raw === 'object') {
@@ -132,9 +147,15 @@ export class DeviceStore {
     this.timer.unref?.();
   }
 
-  async flush() {
+  /** Save now; saves never overlap (they share the same temporary file). */
+  flush() {
     clearTimeout(this.timer);
     this.timer = null;
+    this.saving = (this.saving ?? Promise.resolve()).then(() => this.#save());
+    return this.saving;
+  }
+
+  async #save() {
     if (!this.ready) {
       return;
     }

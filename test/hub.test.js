@@ -399,3 +399,44 @@ test('the widget explains what is missing', async () => {
     world.app.stop();
   }
 });
+
+test('a sensor removed while silent, then heard and added again, is not silent', async (t) => {
+  const world = await addedWorld(t, { config: { broker_url: BROKER_URL, silent_after: '1' } });
+  await tick(t, HOUR);
+  assert.equal(events(world, 'device_silent').length, 1);
+  const device = world.gladys.devices.find(
+    (d) => d.external_id === deviceIds(world.gladys, DOOR).device,
+  );
+  await world.gladys.fake.deviceDeleted(device);
+  world.broker.send(topicOf(DOOR, 'up'), JSON.stringify(fixture('up.json')));
+  await flush();
+  await addDiscovered(world, deviceIds(world.gladys, DOOR).device);
+  assert.equal(world.hub.deviceStatus(DOOR).silent, false);
+  world.broker.send(topicOf(DOOR, 'up'), JSON.stringify(fixture('up.json')));
+  await flush();
+  assert.equal(events(world, 'device_back').length, 0);
+});
+
+test('the link state is told again when Gladys sends the configuration again', async (t) => {
+  const world = await addedWorld(t);
+  world.broker.client.emit('error', Object.assign(new Error('Not authorized'), { code: 5 }));
+  await flush();
+  // Gladys was away and lost that status; it comes back with the same configuration.
+  world.gladys.fake.connectionStatuses.length = 0;
+  await world.gladys.fake.configUpdated({ broker_url: BROKER_URL });
+  assert.equal(world.gladys.fake.connectionStatus.connected, false);
+  assert.match(world.gladys.fake.connectionStatus.message.en, /refuses/);
+});
+
+test('send_downlink answers in time when the broker never acknowledges', async (t) => {
+  const world = await addedWorld(t);
+  world.broker.client.publish = () => {}; // the link dropped before the PUBACK
+  const pending = world.hub.sendDownlink({
+    device: deviceIds(world.gladys, DOOR).device,
+    f_port: 1,
+    payload: '01',
+  });
+  const rejected = assert.rejects(pending, /broker MQTT n'a pas accepté/);
+  await tick(t, 5000);
+  await rejected;
+});
