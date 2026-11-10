@@ -1,0 +1,22 @@
+{
+  "deduplicationId": "90f55ca5-27ae-489d-83db-cf42a47c06a3",
+  "time": "2026-11-10T17:45:07.862+00:00",
+  "deviceInfo": {
+    "tenantId": "5f6ea1bf-dc2f-446d-a4f0-badc2a541a3b",
+    "tenantName": "ChirpStack",
+    "applicationId": "7b2d5233-1a42-433e-9455-5ea9bb6becde",
+    "applicationName": "Garden",
+    "deviceProfileId": "4e760675-ec3b-4d7b-a419-52e4a92b2c6d",
+    "deviceProfileName": "LHT65-like door sensor",
+    "deviceName": "Shed door",
+    "devEui": "70b3d57ed0000001",
+    "deviceClassEnabled": "CLASS_A",
+    "tags": {
+      "room": "shed"
+    }
+  },
+  "margin": 10,
+  "externalPowerSource": false,
+  "batteryLevelUnavailable": false,
+  "batteryLevel": 78.74016
+}

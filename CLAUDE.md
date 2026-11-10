@@ -31,17 +31,22 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only: src/app.js registers the handlers before connect()
+src/app.js                        handlers: discovery, action, scene action, widget, configuration
+src/hub.js                        MQTT link, uplinks -> states, discovery, triggers, silence, downlinks
+src/chirpstack.js                 pure: ChirpStack topics and payloads (v4, v3), downlink command
+src/mapping.js                    pure: codec keys -> kinds, values -> states, key overrides
+src/devices.js                    the Gladys device of a LoRaWAN device (feature keys are forever)
+src/store.js                      devices heard, kept in /data/devices.json
+src/mqtt.js                       MQTT client and its link states, QoS 1 publish
+src/scenes.js, src/widgets.js     send_downlink scene action, devices widget
+src/texts.js                      every text, in en/fr/de/es
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
-gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
-.github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
+src/clientId.js                   stable MQTT client id, kept in /data
+gladys-assistant-integration.json manifest
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys
+test/                             node --test, against the SDK's fake Gladys and a fake broker;
+                                  test/fixtures/chirpstack/ = events captured from a real ChirpStack v4
 ```
 
 ## Rules
@@ -70,8 +75,8 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** is in English, French, German and Spanish: action
+  messages, manifest texts, and `docs/{en,fr,de,es}.md`, kept in sync.
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -251,3 +256,23 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## ChirpStack (cette intégration)
+
+- **Format** vérifié sur un vrai ChirpStack v4 (pile `chirpstack-docker`, passerelle simulée en UDP Semtech
+  vers le gateway bridge, appareil ABP avec codec JS, appareil OTAA) : `application/<app id>/device/<deveui>/event/<up|status|join|…>`,
+  JSON en camelCase (`deviceInfo.deviceName`, `fPort`, `fCnt`, `data` base64, `object`, `rxInfo[].rssi/snr`).
+  Les captures sont dans `test/fixtures/chirpstack/`. Le statut (`batteryLevel` en %, flottant) n'arrive que
+  si l'appareil répond à un DevStatusReq (fréquence réglée dans le profil d'appareil).
+- **Downlink** : `application/<app id>/device/<deveui>/command/down`, `{ devEui, confirmed, fPort, data }`,
+  vérifié en vrai (la file de l'appareil dans ChirpStack le montre). L'id d'application vient des
+  événements : il est gardé dans `/data/devices.json` pour qu'un downlink marche après redémarrage.
+- **Pas d'API ChirpStack** : le REST n'existe que via le proxy `chirpstack-rest-api` (le cœur ne parle que
+  gRPC) et `/api/internal/login` n'y est pas exposé ; les noms arrivent de toute façon avec chaque événement.
+- **Type deviné une fois** : le type d'une clé du codec est stocké à sa première apparition
+  (`devices.json`) ; changer l'heuristique de `src/mapping.js` ne change donc pas une fonctionnalité déjà vue.
+  Une clé corrigée par l'utilisateur, si : il fait « Mettre à jour ».
+- **Silence** compté depuis le dernier uplink ou la connexion au broker, le plus tardif ; une fois par
+  silence (`silentSince` persistant, pour ne pas redéclencher après redémarrage).
+- `uplink_received` part à **chaque** uplink d'un appareil ajouté : c'est voulu (boutons, compteurs), le
+  cœur filtre. Budget : quelques états par uplink, loin des 300/min pour un usage domestique.
