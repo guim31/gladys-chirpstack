@@ -20,7 +20,7 @@ export const MAX_DEVICES = 500;
 export function fileStorage(dir = process.env.DATA_DIR || '/data') {
   const file = join(dir, 'devices.json');
   return {
-    /** null when there is no file yet; throws when it cannot be read. */
+    /** null when there is no file yet; throws when it cannot be read or is damaged. */
     async load() {
       let text;
       try {
@@ -31,7 +31,14 @@ export function fileStorage(dir = process.env.DATA_DIR || '/data') {
         }
         throw err;
       }
-      return JSON.parse(text);
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        // Damaged (a crash mid-write, a full disk): kept aside for a look, and
+        // the list starts again from the uplinks.
+        await rename(file, `${file}.bad`);
+        throw err;
+      }
     },
     async save(data) {
       await mkdir(dir, { recursive: true });

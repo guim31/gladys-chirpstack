@@ -248,7 +248,7 @@ export const DOWNLINK_TEXT = {
     fPort: 'The fPort must be a whole number from 1 to 223.',
     payload: 'The payload must be hexadecimal (for example 0100FF), 242 bytes at most.',
     offline: 'The MQTT broker is not connected: downlink not sent.',
-    failed: 'The MQTT broker did not accept the downlink.',
+    failed: 'The MQTT broker did not confirm the downlink: it may still be sent later.',
   },
   fr: {
     sent: (name, port, bytes) =>
@@ -259,7 +259,8 @@ export const DOWNLINK_TEXT = {
     fPort: 'Le fPort doit être un nombre entier de 1 à 223.',
     payload: 'Le contenu doit être en hexadécimal (par exemple 0100FF), 242 octets au plus.',
     offline: "Le broker MQTT n'est pas connecté : message descendant non envoyé.",
-    failed: "Le broker MQTT n'a pas accepté le message descendant.",
+    failed:
+      "Le broker MQTT n'a pas confirmé le message descendant : il peut encore partir plus tard.",
   },
   de: {
     sent: (name, port, bytes) =>
@@ -270,7 +271,8 @@ export const DOWNLINK_TEXT = {
     fPort: 'Der fPort muss eine ganze Zahl von 1 bis 223 sein.',
     payload: 'Der Inhalt muss hexadezimal sein (zum Beispiel 0100FF), höchstens 242 Bytes.',
     offline: 'Der MQTT-Broker ist nicht verbunden: Downlink nicht gesendet.',
-    failed: 'Der MQTT-Broker hat den Downlink nicht angenommen.',
+    failed:
+      'Der MQTT-Broker hat den Downlink nicht bestätigt: Er kann später noch gesendet werden.',
   },
   es: {
     sent: (name, port, bytes) =>
@@ -281,6 +283,6 @@ export const DOWNLINK_TEXT = {
     fPort: 'El fPort debe ser un número entero de 1 a 223.',
     payload: 'El contenido debe estar en hexadecimal (por ejemplo 0100FF), 242 bytes como máximo.',
     offline: 'El broker MQTT no está conectado: mensaje descendente no enviado.',
-    failed: 'El broker MQTT no aceptó el mensaje descendente.',
+    failed: 'El broker MQTT no confirmó el mensaje descendente: aún puede enviarse más tarde.',
   },
 };

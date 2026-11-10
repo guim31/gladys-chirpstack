@@ -161,6 +161,9 @@ test('counts and durations of a detector are not the detector (Dragino LDS02, LW
   assert.equal(guessKind('LAST_WATER_LEAK_DURATION', 5), 'number');
   assert.equal(guessKind('pir_count', 4), 'counter');
   assert.equal(guessKind('tamper_count', 1), 'counter');
+  // Measures keep their kind.
+  assert.equal(guessKind('total_power', 120), 'power');
+  assert.equal(guessKind('last_temp', 20), 'temperature');
 });
 
 test('a battery in volts is a voltage, in percent a battery', () => {

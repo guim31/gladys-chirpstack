@@ -309,13 +309,16 @@ export function guessKind(path, value) {
   }
   // A count or a duration of a detector (DOOR_OPEN_TIMES,
   // LAST_WATER_LEAK_DURATION of the Dragino codecs) is not the detector.
-  if (has(words, 'times', 'count', 'cnt', 'counter', 'pulse', 'pulses', 'total', 'sum')) {
-    return 'counter';
+  const detector = binaryKind(words);
+  if (detector) {
+    if (has(words, 'times', 'count', 'cnt', 'counter', 'pulse', 'pulses', 'total', 'sum')) {
+      return 'counter';
+    }
+    if (has(words, 'duration', 'interval', 'number', 'num', 'last', 'time')) {
+      return 'number';
+    }
   }
-  if (has(words, 'duration', 'interval', 'number', 'num', 'last')) {
-    return 'number';
-  }
-  const kind = binaryKind(words) ?? numericKind(words) ?? 'number';
+  const kind = detector ?? numericKind(words) ?? 'number';
   // A "battery" in volts (3.6) rather than in percent.
   return kind === 'battery' && !Number.isInteger(number) && number <= 5 ? 'voltage' : kind;
 }

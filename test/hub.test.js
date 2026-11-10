@@ -436,7 +436,7 @@ test('send_downlink answers in time when the broker never acknowledges', async (
     f_port: 1,
     payload: '01',
   });
-  const rejected = assert.rejects(pending, /broker MQTT n'a pas accepté/);
+  const rejected = assert.rejects(pending, /broker MQTT n'a pas confirmé/);
   await tick(t, 5000);
   await rejected;
 });
