@@ -1,0 +1,18 @@
+{
+  "deduplicationId": "f5061bd3-c910-46aa-8551-d5a5812c83c2",
+  "time": "2026-11-10T17:45:29.686891570+00:00",
+  "deviceInfo": {
+    "tenantId": "5f6ea1bf-dc2f-446d-a4f0-badc2a541a3b",
+    "tenantName": "ChirpStack",
+    "applicationId": "7b2d5233-1a42-433e-9455-5ea9bb6becde",
+    "applicationName": "Garden",
+    "deviceProfileId": "7695ebb3-2d95-4175-bdd3-edf6da96af8b",
+    "deviceProfileName": "OTAA sensor",
+    "deviceName": "Cellar leak sensor",
+    "devEui": "70b3d57ed0000002",
+    "deviceClassEnabled": "CLASS_A",
+    "tags": {}
+  },
+  "devAddr": "01e52efe",
+  "regionConfigId": "eu868"
+}

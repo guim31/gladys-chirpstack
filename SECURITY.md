@@ -30,6 +30,14 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
+The integration connects to the MQTT broker set in its configuration, with the
+user name and password typed there (kept by Gladys, never logged, never written
+by the integration). It subscribes to the ChirpStack event topics and publishes
+only the downlinks a scene asks for, with the fPort and payload typed in that
+scene. It writes to `/data` its MQTT client id and `devices.json`: the DevEUI,
+names, application id, codec keys and last uplink time of the devices heard.
+It keeps the last values in memory. No other network access, no cloud service.
+
 Out of scope: Gladys Assistant itself (see its
 [security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+the MQTT broker, ChirpStack and the LoRaWAN devices.

@@ -1,0 +1,61 @@
+{
+  "deduplicationId": "b957b191-460a-491c-96d7-1aa11beb4835",
+  "time": "2026-11-10T17:44:53.227+00:00",
+  "deviceInfo": {
+    "tenantId": "5f6ea1bf-dc2f-446d-a4f0-badc2a541a3b",
+    "tenantName": "ChirpStack",
+    "applicationId": "7b2d5233-1a42-433e-9455-5ea9bb6becde",
+    "applicationName": "Garden",
+    "deviceProfileId": "4e760675-ec3b-4d7b-a419-52e4a92b2c6d",
+    "deviceProfileName": "LHT65-like door sensor",
+    "deviceName": "Shed door",
+    "devEui": "70b3d57ed0000001",
+    "deviceClassEnabled": "CLASS_A",
+    "tags": {
+      "room": "shed"
+    }
+  },
+  "devAddr": "01a2b3c4",
+  "adr": false,
+  "dr": 5,
+  "fCnt": 2,
+  "fPort": 2,
+  "confirmed": false,
+  "data": "C+oIaQHiB54BAAJk",
+  "object": {
+    "TempC_DS": 19.5,
+    "TempC_SHT": 21.53,
+    "Work_mode": "Door",
+    "sensor": {
+      "co2": 612
+    },
+    "WATER_LEAK": false,
+    "DOOR_OPEN_STATUS": 1,
+    "BatV": 3.05,
+    "Hum_SHT": 48.2
+  },
+  "rxInfo": [
+    {
+      "gatewayId": "0016c001ff100001",
+      "uplinkId": 2958,
+      "gwTime": "2026-11-10T17:44:53.227+00:00",
+      "nsTime": "2026-11-10T17:44:53.240893121+00:00",
+      "rssi": -97,
+      "snr": 7.5,
+      "location": {},
+      "context": "osnl+A==",
+      "crcStatus": "CRC_OK"
+    }
+  ],
+  "txInfo": {
+    "frequency": 868100000,
+    "modulation": {
+      "lora": {
+        "bandwidth": 125000,
+        "spreadingFactor": 7,
+        "codeRate": "CR_4_5"
+      }
+    }
+  },
+  "regionConfigId": "eu868"
+}
