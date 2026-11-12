@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-12
+
 ### Added
 
 - The LoRaWAN devices of a ChirpStack v4 server, read from its MQTT
@@ -28,3 +30,6 @@ the notes of the version's GitHub Release.
   silent ones first.
 - "Check the connection" action; texts and documentation in English, French,
   German and Spanish.
+
+[Unreleased]: https://github.com/guim31/gladys-chirpstack/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-chirpstack/releases/tag/v1.0.0
